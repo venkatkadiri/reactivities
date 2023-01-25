@@ -13,6 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Persistance;
+using MediatR;
+using Application.Activities;
+using Application.Core;
 
 namespace API
 {
@@ -38,7 +41,12 @@ namespace API
             {
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
+            services.AddCors(opt => opt.AddPolicy("CORS Policy", Policy => Policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000")));
+            services.AddMediatR(typeof(List));
+            services.AddAutoMapper(typeof(MappingProfile));
+
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,7 +60,7 @@ namespace API
 
 
             app.UseRouting();
-
+            app.UseCors("CORS Policy");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
